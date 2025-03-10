@@ -1,0 +1,188 @@
+"use client"
+
+import { useState } from "react"
+import Image from "next/image"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Download, Heart, Share2, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
+
+// Sample photo data
+const photos = [
+  {
+    id: 1,
+    src: "/placeholder.svg?height=600&width=800",
+    alt: "Mountain landscape with lake",
+    title: "Mountain Serenity",
+    description: "A peaceful mountain landscape with a crystal clear lake reflecting the sky.",
+    category: "landscapes",
+  },
+  {
+    id: 2,
+    src: "/placeholder.svg?height=800&width=600",
+    alt: "Portrait of a woman",
+    title: "Natural Light Portrait",
+    description: "Portrait of a woman in natural lighting against a neutral background.",
+    category: "portraits",
+  },
+  {
+    id: 3,
+    src: "/placeholder.svg?height=600&width=800",
+    alt: "City skyline at sunset",
+    title: "Urban Sunset",
+    description: "Dramatic city skyline silhouette against a colorful sunset sky.",
+    category: "urban",
+  },
+  {
+    id: 4,
+    src: "/placeholder.svg?height=800&width=600",
+    alt: "Man with vintage camera",
+    title: "The Photographer",
+    description: "Portrait of a photographer with a vintage film camera.",
+    category: "portraits",
+  },
+  {
+    id: 5,
+    src: "/placeholder.svg?height=600&width=800",
+    alt: "Desert landscape",
+    title: "Desert Dunes",
+    description: "Rolling sand dunes in a vast desert landscape at golden hour.",
+    category: "landscapes",
+  },
+  {
+    id: 6,
+    src: "/placeholder.svg?height=600&width=800",
+    alt: "Street art mural",
+    title: "Urban Expression",
+    description: "Colorful street art mural on a city building wall.",
+    category: "urban",
+  },
+  {
+    id: 7,
+    src: "/placeholder.svg?height=800&width=600",
+    alt: "Child playing in autumn leaves",
+    title: "Autumn Joy",
+    description: "Child playing in a pile of colorful autumn leaves.",
+    category: "portraits",
+  },
+  {
+    id: 8,
+    src: "/placeholder.svg?height=600&width=800",
+    alt: "Ocean waves at sunset",
+    title: "Ocean Sunset",
+    description: "Dramatic ocean waves crashing against rocks at sunset.",
+    category: "landscapes",
+  },
+  {
+    id: 9,
+    src: "/placeholder.svg?height=600&width=800",
+    alt: "Night cityscape with lights",
+    title: "City Lights",
+    description: "Vibrant cityscape at night with illuminated buildings and streets.",
+    category: "urban",
+  },
+]
+
+export function PhotoGallery() {
+  const [selectedPhoto, setSelectedPhoto] = useState<(typeof photos)[0] | null>(null)
+  const [activeTab, setActiveTab] = useState("all")
+
+  const filteredPhotos = activeTab === "all" ? photos : photos.filter((photo) => photo.category === activeTab)
+
+  return (
+    <div className="space-y-8">
+      <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
+        <div className="flex justify-center mb-8">
+          <TabsList>
+            <TabsTrigger value="all">All Photos</TabsTrigger>
+            <TabsTrigger value="landscapes">Landscapes</TabsTrigger>
+            <TabsTrigger value="portraits">Portraits</TabsTrigger>
+            <TabsTrigger value="urban">Urban</TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value={activeTab} className="mt-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredPhotos.map((photo) => (
+              <div
+                key={photo.id}
+                className="group relative overflow-hidden rounded-lg cursor-pointer transition-all hover:shadow-xl"
+                onClick={() => setSelectedPhoto(photo)}
+              >
+                <div className="aspect-square md:aspect-[3/4] lg:aspect-[4/3] relative overflow-hidden rounded-lg">
+                  <Image
+                    src={photo.src || "/placeholder.svg"}
+                    alt={photo.alt}
+                    fill
+                    className="object-cover transition-transform group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                    <div className="w-full p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
+                      <h3 className="font-medium">{photo.title}</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      <Dialog open={!!selectedPhoto} onOpenChange={(open) => !open && setSelectedPhoto(null)}>
+        <DialogContent className="max-w-4xl p-0 overflow-hidden">
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-2 z-10 rounded-full bg-black/20 text-white hover:bg-black/40"
+              onClick={() => setSelectedPhoto(null)}
+            >
+              <X className="h-5 w-5" />
+              <span className="sr-only">Close</span>
+            </Button>
+
+            <div className="relative h-[70vh] bg-muted">
+              {selectedPhoto && (
+                <Image
+                  src={selectedPhoto.src || "/placeholder.svg"}
+                  alt={selectedPhoto.alt}
+                  fill
+                  className="object-contain"
+                />
+              )}
+            </div>
+
+            {selectedPhoto && (
+              <div className="p-6">
+                <DialogHeader>
+                  <DialogTitle>{selectedPhoto.title}</DialogTitle>
+                  <DialogDescription>{selectedPhoto.description}</DialogDescription>
+                </DialogHeader>
+                <div className="flex justify-between items-center mt-4">
+                  <div className="text-sm text-muted-foreground">
+                    Category: {selectedPhoto.category.charAt(0).toUpperCase() + selectedPhoto.category.slice(1)}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="icon">
+                      <Heart className="h-4 w-4" />
+                      <span className="sr-only">Like</span>
+                    </Button>
+                    <Button variant="outline" size="icon">
+                      <Share2 className="h-4 w-4" />
+                      <span className="sr-only">Share</span>
+                    </Button>
+                    <Button variant="outline" size="icon">
+                      <Download className="h-4 w-4" />
+                      <span className="sr-only">Download</span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
+
